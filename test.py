@@ -55,17 +55,19 @@ if __name__ == '__main__':
             checkRequirements = any(keyword in message.plain.lower() for keyword in requiredKeywords)
             uncheckRequirements = any(keyword in message.plain.lower() for keyword in filterOut)
             
-            if checkRequirements and not uncheckRequirements:
-                cleanedMail = cleanTheMail(message.plain)
-                saveToJSON(message.subject, cleanedMail)
-                requirementMatch += 1
-                message.mark_as_read()
-                message.star()
-            else:
-                deletedMails += 1
-                message.trash()
-            # sleep(0.3)
-
+            try:
+                if checkRequirements and not uncheckRequirements:
+                    cleanedMail = cleanTheMail(message.plain)
+                    saveToJSON(message.subject, cleanedMail)
+                    requirementMatch += 1
+                    message.mark_as_read()
+                    message.star()
+                else:
+                    deletedMails += 1
+                    message.trash()
+                # sleep(0.3)
+            except:
+                print("Something somewhere went wrong boi..")
     # Summary
     tqdm.write(Fore.GREEN + f"Total Emails Parsed: {totalEmails}" + Style.RESET_ALL)
     tqdm.write(Fore.CYAN + f"Requirement Match: {requirementMatch}" + Style.RESET_ALL)
