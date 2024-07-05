@@ -5,7 +5,8 @@ from colorama import Fore, Style, init
 from time import sleep
 import re, os, json
 
-requiredKeywords = ["devops", "pipeline", "ci/cd", "cicd", "ci-cd"]
+requiredKeywords = ["devops", "pipeline", "ci/cd", "cicd", "ci-cd", "aws"]
+filterOut = ["need locals", "need local", "local only", "security clearance", "8+", "9+", "10+", "11+", "12+"]
 init()
 
 def cleanTheMail(emailContent):
@@ -51,17 +52,19 @@ if __name__ == '__main__':
 
     for message in tqdm(inboxMessages, desc="Processing Emails", unit="email"):
         if "powerhouse" in message.sender.lower():
-            checkOccurrence = any(keyword in message.plain.lower() for keyword in requiredKeywords)
-            if checkOccurrence:
+            checkRequirements = any(keyword in message.plain.lower() for keyword in requiredKeywords)
+            uncheckRequirements = any(keyword in message.plain.lower() for keyword in filterOut)
+            
+            if checkRequirements and not uncheckRequirements:
                 cleanedMail = cleanTheMail(message.plain)
                 saveToJSON(message.subject, cleanedMail)
                 requirementMatch += 1
-                # message.mark_as_read()
+                message.mark_as_read()
                 message.star()
             else:
                 deletedMails += 1
                 message.trash()
-            sleep(0.3)
+            # sleep(0.3)
 
     # Summary
     tqdm.write(Fore.GREEN + f"Total Emails Parsed: {totalEmails}" + Style.RESET_ALL)
