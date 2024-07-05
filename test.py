@@ -5,8 +5,12 @@ from colorama import Fore, Style, init
 from time import sleep
 import re, os, json
 
-requiredKeywords = ["devops", "pipeline", "ci/cd", "cicd", "ci-cd", "aws"]
-filterOut = ["need locals", "need local", "local only", "security clearance", "8+", "9+", "10+", "11+", "12+"]
+contentIn = ["devops", "pipeline", "ci/cd", "cicd", "ci-cd", "aws"]
+contentOut = ["need locals", "need local", "local only", "security clearance", "8+", "9+", "10+", "11+", "12+"]
+# SUBJECT FILTERING
+subjectIn = ["devops", "azure", "aws", "cloud", "cloud engineer", "cloud developer", "terraform", "ansible", "cicd", "ci-ci", "ci/cd", "kubernetes"]
+subjectOut = ["admin", "platform", "devsecops", "fullstack", "java", ".net", "analyst", "full stack", "product"]
+
 init()
 
 def cleanTheMail(emailContent):
@@ -38,8 +42,16 @@ def saveToJSON(subject, message):
     with open(fileName, 'w') as file:
         json.dump(data, file, indent=4)
     
-    print(f"Data saved to {fileName}")
+    # print(f"Data saved to {fileName}")
 
+def checkRequirementMatching(taroText, shouldBe, shouldNot):
+    for temp1 in shouldBe:
+        if temp1 in taroText:
+            for temp2 in shouldNot:
+                if temp2 in taroText:
+                    return False
+            return True
+    return False
 
 if __name__ == '__main__':
     gmail = Gmail()
@@ -52,11 +64,10 @@ if __name__ == '__main__':
 
     for message in tqdm(inboxMessages, desc="Processing Emails", unit="email"):
         if "powerhouse" in message.sender.lower():
-            checkRequirements = any(keyword in message.plain.lower() for keyword in requiredKeywords)
-            uncheckRequirements = any(keyword in message.plain.lower() for keyword in filterOut)
-            
+            checkSubject = checkRequirementMatching(message.subject.lower(), subjectIn, subjectOut)
+            checkRequirements = checkRequirementMatching(message.plain.lower(), contentIn, contentOut)
             try:
-                if checkRequirements and not uncheckRequirements:
+                if checkRequirements and checkSubject:
                     cleanedMail = cleanTheMail(message.plain)
                     saveToJSON(message.subject, cleanedMail)
                     requirementMatch += 1
