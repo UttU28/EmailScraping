@@ -6,7 +6,7 @@ from time import sleep
 import re, os, json
 
 contentIn = ["devops", "pipeline", "ci/cd", "cicd", "ci-cd", "aws"]
-contentOut = ["need locals", "need local", "local only", "security clearance", "8+", "9+", "10+", "11+", "12+"]
+contentOut = ["usc", "usc gc", "security clearance", "8+", "9+", "10+", "11+", "12+"]
 # SUBJECT FILTERING
 subjectIn = ["devops", "azure", "aws", "cloud", "cloud engineer", "cloud developer", "terraform", "ansible", "cicd", "ci-ci", "ci/cd", "kubernetes"]
 subjectOut = ["admin", "platform", "devsecops", "fullstack", "java", ".net", "analyst", "full stack", "product"]
