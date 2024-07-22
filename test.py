@@ -53,7 +53,37 @@ def checkRequirementMatching(taroText, shouldBe, shouldNot):
             return True
     return False
 
+def deleteOldMails():
+    keyword = 'powerhouse'
+    days = 2
+    gmail = Gmail()
+    try:
+        query_params = {
+            "older_than": (days, "day"),
+        }
+        messages_to_delete = gmail.get_messages(query=construct_query(query_params))
+        total_messages = len(messages_to_delete)
+        delete_count = 0
+
+        with tqdm(total=total_messages, desc=f"Deleting messages from 'powerhouse'") as pbar:
+            for message in messages_to_delete:
+                sender = message.sender.lower() if message.sender else ''
+                if keyword.lower() in sender:
+                    try:
+                        message.trash()
+                        delete_count += 1
+                    except Exception as e:
+                        print(f"Error deleting message: {str(e)}")
+
+                pbar.update(1)
+
+        print(f"\nDeleted {delete_count} messages from '{keyword}' senders older than {days} days.")
+
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+
 if __name__ == '__main__':
+    deleteOldMails()
     gmail = Gmail()
     inboxMessages = gmail.get_unread_inbox()
     totalEmails = len(inboxMessages)
